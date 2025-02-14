@@ -4,7 +4,7 @@ let ctx = canvas.getContext("2d");
 let width = canvas.width;
 let height = canvas.height;
 
-const MAX_COMPUTER_SPEED =2;
+const MAX_COMPUTER_SPEED = 2;
 
 const BALL_SIZE = 5;
 let ballPosition;
@@ -22,32 +22,11 @@ let rightPaddleTop = 30;
 let leftScore = 0;
 let rightScore = 0;
 
+let gameOver = false;
+
 document.addEventListener("mousemove", (e) => {
   rightPaddleTop = e.y - canvas.offsetTop;
 });
-
-function initBall() {
-  ballPosition = {x:20, y:30};
-  xSpeed = 4;
-  ySpeed = 2;
-}
-
-function followBall() {
-  let ball = {
-    top: ballPosition.y,
-    bottom: ballPosition.y + BALL_SIZE
-  };
-  let leftPaddle = {
-    top: leftPaddleTop,
-    bottom: leftPaddleTop + PADDLE_HEIGHT
-  }
-
-  if(ball.top < leftPaddle.top) {
-    leftPaddleTop -= MAX_COMPUTER_SPEED;
-  } else if (ball.bottom > leftPaddle.bottom) {
-    leftPaddleTop += MAX_COMPUTER_SPEED;
-  }
-}
 
 function draw() {
   drawBackground();
@@ -88,6 +67,36 @@ function drawScore() {
   ctx.fillText(leftScore.toString(), 50, 50);
   ctx.textAlign = "right";
   ctx.fillText(rightScore.toString(), width - 50, 50);
+}
+
+function drawGameOver() {
+  ctx.fillStyle = "white";
+  ctx.font = "30px monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("GAME OVER", width / 2, height / 2);
+}
+
+function initBall() {
+  ballPosition = { x: 20, y: 30 };
+  xSpeed = 4;
+  ySpeed = 2;
+}
+
+function followBall() {
+  let ball = {
+    top: ballPosition.y,
+    bottom: ballPosition.y + BALL_SIZE,
+  };
+  let leftPaddle = {
+    top: leftPaddleTop,
+    bottom: leftPaddleTop + PADDLE_HEIGHT,
+  };
+
+  if (ball.top < leftPaddle.top) {
+    leftPaddleTop -= MAX_COMPUTER_SPEED;
+  } else if (ball.bottom > leftPaddle.bottom) {
+    leftPaddleTop += MAX_COMPUTER_SPEED;
+  }
 }
 
 function adjustAngle(distanceFromTop, distanceFromBottom) {
@@ -143,13 +152,17 @@ function checkCollision() {
   }
 
   if (ball.left < 0) {
-    rightScore++
+    rightScore++;
     initBall();
   }
 
   if (ball.right > width) {
     leftScore++;
     initBall();
+  }
+
+  if (leftScore > 9 || rightScore > 9) {
+    gameOver = true;
   }
 
   if (ball.top < 0 || ball.bottom > height) {
@@ -162,7 +175,13 @@ function gameLoop() {
   update();
   checkCollision();
 
-  setTimeout(gameLoop, 30);
+  if( gameOver ) {
+    draw();
+    drawGameOver();
+  } else {
+    setTimeout(gameLoop, 30);
+  }
+
 }
 
 initBall();
