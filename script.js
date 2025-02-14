@@ -4,6 +4,8 @@ let ctx = canvas.getContext("2d");
 let width = canvas.width;
 let height = canvas.height;
 
+const MAX_COMPUTER_SPEED =2;
+
 const BALL_SIZE = 5;
 let ballPosition;
 
@@ -30,6 +32,23 @@ function initBall() {
   ySpeed = 2;
 }
 
+function followBall() {
+  let ball = {
+    top: ballPosition.y,
+    bottom: ballPosition.y + BALL_SIZE
+  };
+  let leftPaddle = {
+    top: leftPaddleTop,
+    bottom: leftPaddleTop + PADDLE_HEIGHT
+  }
+
+  if(ball.top < leftPaddle.top) {
+    leftPaddleTop -= MAX_COMPUTER_SPEED;
+  } else if (ball.bottom > leftPaddle.bottom) {
+    leftPaddleTop += MAX_COMPUTER_SPEED;
+  }
+}
+
 function draw() {
   drawBackground();
   drawBall();
@@ -40,6 +59,7 @@ function draw() {
 function update() {
   ballPosition.x += xSpeed;
   ballPosition.y += ySpeed;
+  followBall();
 }
 
 function drawBackground() {
