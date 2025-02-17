@@ -141,3 +141,17 @@ class Scores {
     this.rightScore = 0;
   }
 }
+
+class Computer {
+  static followBall(paddle, ball) {
+    const MAX_SPEED = 2;
+    let ballBox = ball.boundingBox();
+    let paddleBox = paddle.boundingBox();
+
+    if (ballBox.top < paddleBox.top) {
+      paddle.y -= MAX_SPEED;
+    } else if (ballBottom > paddleBox.bottom) {
+      paddle.y += MAX_SPEED;
+    }
+  }
+}
