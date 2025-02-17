@@ -34,14 +34,14 @@ class GameView {
 class Entity {
   constructor(x, y, width, height) {
     this.x = x;
-    thix.y = y;
+    this.y = y;
     this.width = width;
     this.height = height;
   }
 
   boundingBox() {
     return {
-      left: thix.x,
+      left: this.x,
       right: this.x + this.width,
       top: this.y,
       bottom: this.y + this.height,
@@ -81,7 +81,7 @@ class Ball extends Entity {
 
   update() {
     this.x += this.xSpeed;
-    thix.y += this.ySpeed;
+    this.y += this.ySpeed;
   }
 
   adjustAngle(distanceFromTop, distanceFromBottom) {
@@ -150,8 +150,61 @@ class Computer {
 
     if (ballBox.top < paddleBox.top) {
       paddle.y -= MAX_SPEED;
-    } else if (ballBottom > paddleBox.bottom) {
+    } else if (ballBox.bottom > paddleBox.bottom) {
       paddle.y += MAX_SPEED;
     }
   }
 }
+
+class Game {
+  constructor() {
+    this.gameView = new GameView();
+    this.ball = new Ball();
+    this.leftPaddle = new Paddle(Paddle.OFFSET, 10);
+    this.rightPaddle = new Paddle(this.gameView.width - Paddle.OFFSET - Paddle.WIDTH, 30);
+
+    this.scores = new Scores();
+    this.gameOver = false;
+
+    document.addEventListener("mousemove", e => {
+      this.rightPaddle.y = e.y - this.gameView.offsetTop;
+    });
+  }
+
+  draw() {
+    this.gameView.draw( this.ball, this.leftPaddle, this.rightPaddle);
+    this.gameView.drawScores(this.scores);
+  }
+
+  checkCollision() {
+    this.ball.checkPaddleColllision(this.leftPaddle, Math.abs(this.ball.xSpeed));
+    this.ball.checkPaddleColllision(this.rightPaddle, -Math.abs(this.ball.xSpeed));
+
+    this.ball.checkWallCollision(this.gameView.width, this.gameView.height, this.scores);
+
+    if (this.scores.leftScore > 9 || this.scores.rightScore > 9) {
+      this.gameOver = true;
+    }
+  }
+
+  update() {
+    this.ball.update();
+    Computer.followBall(this.leftPaddle, this.ball);
+  }
+
+  loop() {
+    this.draw();
+    this.update();
+    this.checkCollision();
+
+    if (this.gameOver) {
+      this.draw();
+      this.gameView.drawGameOver();
+    } else {
+      setTimeout( () => this.loop(), 30);
+    }
+  }
+}
+
+let game = new Game();
+game.loop();
