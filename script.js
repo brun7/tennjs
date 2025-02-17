@@ -1,6 +1,6 @@
 class GameView {
   constructor() {
-    let canvas = document.querySelector("#canvas");
+    const canvas = document.querySelector("#canvas");
     this.ctx = canvas.getContext("2d");
     this.width = canvas.width;
     this.height = canvas.height;
@@ -30,3 +30,27 @@ class GameView {
     this.ctx.fillText("GAME OVER", this.width / 2, this.height / 2);
   }
 }
+
+class Entity {
+  constructor(x, y, width, height) {
+    this.x = x;
+    thix.y = y;
+    this.width = width;
+    this.height = height;
+  }
+
+  boundingBox() {
+    return {
+      left: thix.x,
+      right: this.x + this.width,
+      top: this.y,
+      bottom: this.y + this.height
+    };
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+}
+
